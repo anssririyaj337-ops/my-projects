@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Compare Documents | VeriText.ai Plagiarism Checker{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 2rem;">
+  
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2.25rem; margin-bottom: 0.5rem;">Document Similarity Checker</h1>
+    <p>Paste text directly, drag & drop text files, or <strong>upload photos/screenshots</strong> — OCR will automatically extract the text for comparison.</p>
+  </div>
+
+  <!-- Academic Sample Presets Bar for Instant QA & Demo Testing -->
+  <div class="presets-bar">
+    <div class="presets-label">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+      <span>Load Test Sample:</span>
+    </div>
+    <button type="button" class="preset-chip" data-preset="exact">100% Exact Copy</button>
+    <button type="button" class="preset-chip" data-preset="transposed">Transposed Sentences</button>
+    <button type="button" class="preset-chip" data-preset="paraphrased">Paraphrased Academic Text</button>
+    <button type="button" class="preset-chip" data-preset="different">Different Topics (0%)</button>
+  </div>
+
+  <form method="POST" action="{{ url_for('checker') }}" enctype="multipart/form-data" id="checker_form">
+    
+    <div class="checker-layout">
+      
+      <!-- Document 1: Original -->
+      <div class="glass-card doc-panel">
+        <div class="doc-header">
+          <div class="doc-title-group">
+            <div class="doc-number-badge">1</div>
+            <h3 style="font-size: 1.1rem; font-weight: 700;">Document 1 (Original)</h3>
+          </div>
+          <div class="doc-stat-pill">
+            <span id="doc1_words_count">0 words</span> &bull; <span id="doc1_chars_count">0 chars</span>
+          </div>
+        </div>
+
+        <div class="textarea-wrapper">
+          <textarea 
+            name="doc1_text" 
+            id="doc1_text" 
+            class="doc-textarea" 
+            placeholder="Paste or type original document text here...">{{ doc1_text or '' }}</textarea>
+        </div>
+
+        <!-- Drag & Drop Upload Zone -->
+        <div class="dropzone-container" id="doc1_dropzone">
+          <input type="file" name="doc1_file" id="doc1_file" style="display: none;" accept=".txt,.md,.py,.c,.cpp,.java,.js,.html,.css,.json,.png,.jpg,.jpeg,.bmp,.webp,.gif">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: var(--text-secondary);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <span class="dropzone-text"><strong>Click to upload</strong> text file or <strong>photo/screenshot</strong> (OCR)</span>
+          </div>
+          <div class="file-chosen-name" id="doc1_filename"></div>
+          <div class="ocr-status" id="doc1_ocr_status"></div>
+        </div>
+      </div>
+
+      <!-- Document 2: Suspected Duplicate -->
+      <div class="glass-card doc-panel">
+        <div class="doc-header">
+          <div class="doc-title-group">
+            <div class="doc-number-badge" style="color: var(--accent-cyan);">2</div>
+            <h3 style="font-size: 1.1rem; font-weight: 700;">Document 2 (Suspected Copy)</h3>
+          </div>
+          <div class="doc-stat-pill">
+            <span id="doc2_words_count">0 words</span> &bull; <span id="doc2_chars_count">0 chars</span>
+          </div>
+        </div>
+
+        <div class="textarea-wrapper">
+          <textarea 
+            name="doc2_text" 
+            id="doc2_text" 
+            class="doc-textarea" 
+            placeholder="Paste or type suspected copy text here...">{{ doc2_text or '' }}</textarea>
+        </div>
+
+        <!-- Drag & Drop Upload Zone -->
+        <div class="dropzone-container" id="doc2_dropzone">
+          <input type="file" name="doc2_file" id="doc2_file" style="display: none;" accept=".txt,.md,.py,.c,.cpp,.java,.js,.html,.css,.json,.png,.jpg,.jpeg,.bmp,.webp,.gif">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: var(--text-secondary);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            <span class="dropzone-text"><strong>Click to upload</strong> text file or <strong>photo/screenshot</strong> (OCR)</span>
+          </div>
+          <div class="file-chosen-name" id="doc2_filename"></div>
+          <div class="ocr-status" id="doc2_ocr_status"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Actions Submit Bar -->
+    <div class="checker-submit-bar">
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <button type="button" class="btn btn-secondary btn-sm" id="swap_docs_btn" title="Swap Document 1 and Document 2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+          Swap Documents
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" id="clear_all_btn" title="Clear all textareas">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          Clear All
+        </button>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg" id="submit_check_btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        Analyze Plagiarism
+      </button>
+    </div>
+
+  </form>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/tesseract.min.js') }}"></script>
+{% endblock %}

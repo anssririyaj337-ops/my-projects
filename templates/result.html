@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Report #{{ record['id'] }} | VeriText.ai{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 2rem;">
+
+  <!-- Breadcrumb & Actions Header -->
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">
+      <a href="{{ url_for('checker') }}" style="color: var(--text-secondary);">Checker</a>
+      <span>/</span>
+      <span style="color: var(--text-primary); font-weight: 600;">Report #{{ record['id'] }}</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <button type="button" class="btn btn-secondary btn-sm" onclick="window.print();">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Print / PDF Report
+      </button>
+      <a href="{{ url_for('checker') }}" class="btn btn-primary btn-sm">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        New Analysis
+      </a>
+    </div>
+  </div>
+
+  <!-- Verdict Banner -->
+  {% set sim = record['similarity_percentage'] %}
+  {% if sim >= 81.0 %}
+    {% set banner_class = "exact" %}
+    {% set meter_color = "#ef4444" %}
+  {% elif sim >= 61.0 %}
+    {% set banner_class = "high" %}
+    {% set meter_color = "#f59e0b" %}
+  {% elif sim >= 41.0 %}
+    {% set banner_class = "moderate" %}
+    {% set meter_color = "#3b82f6" %}
+  {% else %}
+    {% set banner_class = "low" %}
+    {% set meter_color = "#10b981" %}
+  {% endif %}
+
+  <div class="verdict-banner {{ banner_class }}">
+    <div class="verdict-info">
+      <div class="verdict-badge {{ banner_class }}">{{ record['duplicate_category'] }}</div>
+      <h1 class="verdict-title">{{ record['status'] }}</h1>
+      <p class="verdict-subtitle">
+        Document audit generated on {{ record['created_at'] }} using <strong>{{ engine_type }}</strong>.
+      </p>
+    </div>
+
+    <!-- Dual Circular Gauges -->
+    <div class="gauge-container">
+      
+      <!-- Similarity Meter -->
+      <div class="circle-meter" data-percentage="{{ record['similarity_percentage'] }}">
+        <svg viewBox="0 0 100 100">
+          <circle class="meter-bg" cx="50" cy="50" r="42"></circle>
+          <circle class="meter-fill meter-fill-{{ banner_class }}" cx="50" cy="50" r="42"></circle>
+        </svg>
+        <div class="meter-center-text">
+          <div class="meter-percent">{{ record['similarity_percentage'] }}%</div>
+          <div class="meter-label">Similarity</div>
+        </div>
+      </div>
+
+      <!-- Difference Meter -->
+      <div class="circle-meter" data-percentage="{{ record['difference_percentage'] }}">
+        <svg viewBox="0 0 100 100">
+          <circle class="meter-bg" cx="50" cy="50" r="42"></circle>
+          <circle class="meter-fill meter-fill-diff" cx="50" cy="50" r="42"></circle>
+        </svg>
+        <div class="meter-center-text">
+          <div class="meter-percent">{{ record['difference_percentage'] }}%</div>
+          <div class="meter-label">Unique</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Key Metrics Summary Grid -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <span class="metric-label">Document 1 Length</span>
+      <span class="metric-value">{{ record['document1_word_count'] }} <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">words</span></span>
+    </div>
+
+    <div class="metric-card">
+      <span class="metric-label">Document 2 Length</span>
+      <span class="metric-value">{{ record['document2_word_count'] }} <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">words</span></span>
+    </div>
+
+    <div class="metric-card">
+      <span class="metric-label">Matching Words</span>
+      <span class="metric-value" style="color: #f87171;">{{ matching_words }} <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">words</span></span>
+    </div>
+
+    <div class="metric-card">
+      <span class="metric-label">Unique Non-Matching</span>
+      <span class="metric-value" style="color: #34d399;">{{ unique_words }} <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">words</span></span>
+    </div>
+  </div>
+
+  <!-- Academic Disclaimer Box -->
+  <div style="background: rgba(59, 130, 246, 0.08); border-left: 4px solid var(--accent-primary); border-radius: var(--radius-sm); padding: 0.85rem 1.25rem; margin-bottom: 2rem; font-size: 0.85rem; color: #94a3b8;">
+    <strong>Academic Disclaimer:</strong> The calculated similarity percentage measures vocabulary overlap and phrase correspondence. Common terminology, mathematical notation, or generic academic citations may contribute to similarity without constituting intellectual plagiarism.
+  </div>
+
+  <!-- Side-by-Side Comparison Inspector -->
+  <div class="comparison-inspector">
+    <div class="comparison-header">
+      <h3 style="font-size: 1.2rem; font-weight: 700;">Side-by-Side Document Highlight Inspector</h3>
+
+      <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+        <!-- Synchronized scroll toggle -->
+        <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer; color: var(--text-secondary);">
+          <input type="checkbox" id="sync_scroll_toggle" checked style="accent-color: var(--accent-primary); width: 16px; height: 16px;">
+          <span>Synchronize Scrolling</span>
+        </label>
+
+        <!-- Color Legend -->
+        <div class="legend-bar">
+          <div class="legend-item">
+            <span class="legend-color-box legend-match"></span>
+            <span>Verbatim / Borrowed Match</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color-box legend-unique1"></span>
+            <span>Unique to Doc 1</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color-box legend-unique2"></span>
+            <span>Unique to Doc 2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Synchronized Panes -->
+    <div class="comparison-split">
+      
+      <!-- Doc 1 Pane -->
+      <div class="comparison-pane">
+        <div class="pane-header">
+          <span class="pane-title">Document 1 (Original Source)</span>
+          <span class="pane-badge">{{ record['document1_word_count'] }} words</span>
+        </div>
+        <div class="pane-body" id="comparison_pane_1">{{ highlighted_doc1 | safe }}</div>
+      </div>
+
+      <!-- Doc 2 Pane -->
+      <div class="comparison-pane">
+        <div class="pane-header">
+          <span class="pane-title">Document 2 (Suspected Copy)</span>
+          <span class="pane-badge">{{ record['document2_word_count'] }} words</span>
+        </div>
+        <div class="pane-body" id="comparison_pane_2">{{ highlighted_doc2 | safe }}</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

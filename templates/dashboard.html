@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Dashboard | VeriText.ai Plagiarism Detector{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 2rem; margin-bottom: 4rem;">
+
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2.25rem; margin-bottom: 0.5rem;">Analytics & System Intelligence</h1>
+    <p>Real-time statistics across all plagiarism checks, similarity distribution, and audit summaries.</p>
+  </div>
+
+  <!-- Key Metrics Row -->
+  <div class="metrics-grid">
+    <div class="glass-card metric-card">
+      <span class="metric-label">Total Document Audits</span>
+      <span class="metric-value" style="color: #818cf8;">{{ total_checks }}</span>
+    </div>
+
+    <div class="glass-card metric-card">
+      <span class="metric-label">Average Similarity</span>
+      <span class="metric-value">{{ avg_similarity }}%</span>
+    </div>
+
+    <div class="glass-card metric-card">
+      <span class="metric-label">Highest Similarity</span>
+      <span class="metric-value" style="color: #f87171;">{{ max_similarity }}%</span>
+    </div>
+
+    <div class="glass-card metric-card">
+      <span class="metric-label">Lowest Similarity</span>
+      <span class="metric-value" style="color: #34d399;">{{ min_similarity }}%</span>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    
+    <!-- Similarity Status & Duplicate Category Distributions -->
+    <div class="glass-card">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.2rem;">Similarity Status Distribution</h3>
+        <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">{{ total_checks }} checks</span>
+      </div>
+
+      <div class="progress-bar-container">
+        {% set statuses = [
+          ('Very High Similarity', 'vhigh'),
+          ('High Similarity', 'high'),
+          ('Moderate Similarity', 'mod'),
+          ('Low Similarity', 'low'),
+          ('Very Low Similarity', 'vlow')
+        ] %}
+
+        {% for name, slug in statuses %}
+          {% set count = status_counts.get(name, 0) if status_counts else 0 %}
+          {% set pct = (((count / total_checks) * 100) | round(1)) if (total_checks and total_checks > 0) else 0 %}
+          <div class="progress-item">
+            <div class="progress-header">
+              <span style="color: var(--text-secondary);">{{ name }}</span>
+              <span style="font-family: var(--font-mono); font-weight: 700;">{{ count }} ({{ pct }}%)</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill progress-fill-{{ slug }}" data-width="{{ pct }}%"></div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Academic Duplicate Category Breakdown -->
+      <div style="margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border-subtle);">
+        <h4 style="font-size: 0.95rem; margin-bottom: 0.85rem; color: var(--text-secondary);">Duplicate Categories</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          {% set categories = [
+            ('Exact Duplicate', 'exact'),
+            ('Highly Similar', 'high'),
+            ('Partially Similar', 'partial'),
+            ('Mostly Different', 'different')
+          ] %}
+          {% for cat_name, cat_slug in categories %}
+            {% set cat_count = category_counts.get(cat_name, 0) if category_counts else 0 %}
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.6rem 0.85rem; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 600;">
+                <span class="cat-dot cat-dot-{{ cat_slug }}"></span>
+                <span>{{ cat_name }}</span>
+              </div>
+              <span style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">{{ cat_count }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions & Engine Status -->
+    <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <h3 style="font-size: 1.2rem; margin-bottom: 1rem;">NLP Engine Architecture</h3>
+        <p style="font-size: 0.95rem; margin-bottom: 1.5rem;">
+          VeriText employs pure mathematical L2-normalized vector dot product computation (Cosine Similarity) with smoothed inverse document frequencies.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.9rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border-subtle);">
+            <span style="color: var(--text-muted);">TF-IDF Smoothing:</span>
+            <span style="font-weight: 600;">ln((1 + N)/(1 + df)) + 1</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.9rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border-subtle);">
+            <span style="color: var(--text-muted);">Highlight Algorithm:</span>
+            <span style="font-weight: 600;">Multi-Pass Phrase & Block Matcher</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.9rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border-subtle);">
+            <span style="color: var(--text-muted);">Database Persistence:</span>
+            <span style="font-weight: 600;">SQLite ACID Transactions</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 2rem;">
+        <a href="{{ url_for('checker') }}" class="btn btn-primary" style="width: 100%;">
+          Run New Document Comparison
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Recent Checks Table -->
+  <div class="glass-card">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem;">
+      <h3 style="font-size: 1.2rem;">Recent Audit Activity</h3>
+      <a href="{{ url_for('history') }}" style="font-size: 0.85rem; font-weight: 600;">View All History &rarr;</a>
+    </div>
+
+    {% if recent_checks %}
+    <div class="table-responsive">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Similarity</th>
+            <th>Category</th>
+            <th>Word Counts</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in recent_checks %}
+          <tr>
+            <td style="font-family: var(--font-mono); font-weight: 700; color: var(--text-muted);">#{{ r['id'] }}</td>
+            <td style="font-size: 0.85rem; color: var(--text-secondary);">{{ r['created_at'] }}</td>
+            <td style="font-family: var(--font-mono); font-weight: 700;">{{ r['similarity_percentage'] }}%</td>
+            <td><span style="font-size: 0.8rem; font-weight: 600;">{{ r['duplicate_category'] }}</span></td>
+            <td style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-secondary);">{{ r['document1_word_count'] }} / {{ r['document2_word_count'] }}</td>
+            <td style="text-align: right;">
+              <a href="{{ url_for('result', check_id=r['id']) }}" class="btn btn-secondary btn-sm">Report</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p style="text-align: center; padding: 2rem 0; color: var(--text-muted);">No activity recorded yet.</p>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

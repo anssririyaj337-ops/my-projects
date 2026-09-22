@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error (500) | VeriText.ai{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 5rem 0; text-align: center;">
+  <div class="glass-card" style="max-width: 540px; margin: 0 auto; padding: 3.5rem 2rem;">
+    <div style="font-size: 4rem; font-weight: 800; font-family: var(--font-mono); color: #f87171; line-height: 1; margin-bottom: 1rem;">
+      500
+    </div>
+    <h2 style="font-size: 1.75rem; margin-bottom: 0.75rem;">Internal Processing Error</h2>
+    <p style="margin-bottom: 2rem;">An unexpected error occurred while analyzing the document. Please verify your document encoding and try again.</p>
+    <a href="{{ url_for('checker') }}" class="btn btn-primary">
+      Back to Checker
+    </a>
+  </div>
+</div>
+{% endblock %}

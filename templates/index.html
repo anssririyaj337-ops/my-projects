@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}VeriText.ai | Modern Academic Plagiarism & Duplicate Detector{% endblock %}
+
+{% block content %}
+<div class="container">
+  
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      <span>Live Engine: {{ total_checks }} Document Audits Performed</span>
+    </div>
+
+    <h1 class="hero-title">
+      Detect Text Plagiarism with<br>Mathematical Precision
+    </h1>
+
+    <p class="hero-desc">
+      Compare assignments, research papers, and technical articles using dual-stage TF-IDF Vector Space Analysis and synchronized side-by-side highlighting that catches swapped phrases, paraphrases, and verbatim duplication.
+    </p>
+
+    <div class="hero-actions">
+      <a href="{{ url_for('checker') }}" class="btn btn-primary btn-lg">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        Launch Document Checker
+      </a>
+      <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-lg">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        View Analytics
+      </a>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section class="features-grid">
+    <div class="glass-card feature-card">
+      <div class="feature-icon-wrapper">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+      </div>
+      <h3 class="feature-title">TF-IDF Vector Cosine Engine</h3>
+      <p class="feature-desc">
+        Computes term weights across documents with smooth inverse document frequency, yielding mathematically bounded similarity scores from 0.0% to 100.0%.
+      </p>
+    </div>
+
+    <div class="glass-card feature-card">
+      <div class="feature-icon-wrapper">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      </div>
+      <h3 class="feature-title">Multi-Pass Side-by-Side Diff</h3>
+      <p class="feature-desc">
+        Identifies verbatim clauses and matching phrases even when paragraphs are transposed or shuffled, highlighting matches in color-coded synchronized views.
+      </p>
+    </div>
+
+    <div class="glass-card feature-card">
+      <div class="feature-icon-wrapper">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+      </div>
+      <h3 class="feature-title">Academic Categorization</h3>
+      <p class="feature-desc">
+        Sorts comparison outcomes into standardized academic categories: Exact Duplicate, Highly Similar, Partially Similar, or Mostly Unique with disclaimers.
+      </p>
+    </div>
+  </section>
+
+  <!-- How It Works Card -->
+  <section class="glass-card" style="margin-bottom: 4rem; padding: 2.5rem;">
+    <h2 style="font-size: 1.75rem; margin-bottom: 1.5rem; text-align: center;">How VeriText Works in 3 Steps</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 2rem; margin-top: 1.5rem;">
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="font-size: 2rem; font-weight: 800; color: var(--accent-primary); font-family: var(--font-mono);">01</div>
+        <h4 style="font-size: 1.1rem;">Input or Upload</h4>
+        <p style="font-size: 0.9rem;">Paste text directly or drop plain text files, source code files, or markdown drafts for both documents.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="font-size: 2rem; font-weight: 800; color: var(--accent-cyan); font-family: var(--font-mono);">02</div>
+        <h4 style="font-size: 1.1rem;">Dual Vector Analysis</h4>
+        <p style="font-size: 0.9rem;">Our NLP pipeline cleans tokens, calculates frequency weights, and discovers multi-token phrase overlaps.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="font-size: 2rem; font-weight: 800; color: var(--color-success); font-family: var(--font-mono);">03</div>
+        <h4 style="font-size: 1.1rem;">Audit & Inspect</h4>
+        <p style="font-size: 0.9rem;">Review circular score gauges, lock-step synchronized scrolling, and export reports for academic integrity audits.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
