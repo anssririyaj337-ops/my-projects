@@ -2,3 +2,4 @@ Flask>=3.0.0
 Werkzeug>=3.0.0
 # Optional: scikit-learn (app has a built-in mathematical TF-IDF engine that runs out of the box without extra installs)
 # scikit-learn>=1.3.0
+gunicorn>=21.2.0
